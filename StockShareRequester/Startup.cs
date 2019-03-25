@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using StockShareRequester.Clients;
 using StockShareRequester.OptionModels;
 using Swashbuckle.AspNetCore.Swagger;
 
@@ -42,6 +43,10 @@ namespace StockShareRequester
             //    //    policy.Requirements.Add(new HasScopeRequirement("BankingService.broker&taxer", Configuration["IdentityServerBaseAddress"])));
             //});
 
+            services.AddScoped<IBankClient, BankClient>();
+            services.AddScoped<IStockTraderBrokerClient, StockTraderBrokerClient>();
+            services.AddScoped<ITobinTaxerClient, TobinTaxerClient>();
+            services.AddScoped<IPublicShareOwnerControlClient, PublicShareOwnerControlClient>();
             services.Configure<Services>(Configuration.GetSection(nameof(Services)));
         }
 

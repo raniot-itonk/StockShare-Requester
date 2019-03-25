@@ -2,6 +2,6 @@
 {
     public class TobinTaxerPath
     {
-        public string GetTaxRate { get; set; }
+        public string TaxRate { get; set; }
     }
 }

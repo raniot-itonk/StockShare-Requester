@@ -2,6 +2,6 @@
 {
     public class PublicSharePath
     {
-        public string ValidateStock { get; set; }
+        public string Stock { get; set; }
     }
 }

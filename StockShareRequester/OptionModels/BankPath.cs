@@ -2,6 +2,6 @@
 {
     public class BankPath
     {
-        public string ReserveMoney { get; set; }
+        public string Reservation { get; set; }
     }
 }
