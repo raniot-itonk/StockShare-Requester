@@ -33,7 +33,7 @@ namespace StockShareRequester.Controllers
         //Place Bid
         //[Authorize("BankingService.UserActions")]
         [HttpPost]
-        public async Task<ActionResult> PostPlaceBid(PlaceBidInput placeBidInput)
+        public async Task<ActionResult<ValidationResult>> PostPlaceBid(PlaceBidInput placeBidInput)
         {
             var (jwtToken, accountId) = RequestHelper.GetJwtFromHeader(Request);
             var validateStock = _publicShareOwnerControlClient.ValidateStock(placeBidInput.StockId, jwtToken);
@@ -43,18 +43,20 @@ namespace StockShareRequester.Controllers
 
             var reserveAmount = placeBidInput.Price * placeBidInput.AmountOfShares * (1 + tobinTaxRate.Result);
             var reservationRequest = new ReservationRequest{Amount = reserveAmount, AccountId = accountId};
-            var reserveGuid = await _bankClient.Reserve(reservationRequest, jwtToken);
+            var reservationResult = await _bankClient.Reserve(reservationRequest, jwtToken);
+            if (!reservationResult.Valid) return new ValidationResult{Valid = false, ErrorMessage = reservationResult.ErrorMessage};
+
             var buyRequestInput = new BuyRequestInput
             {
                 AccountId = accountId,
                 AmountOfShares = placeBidInput.AmountOfShares,
                 Price = placeBidInput.Price,
-                ReserveId = reserveGuid,
+                ReserveId = reservationResult.ReservationId,
                 StockId = placeBidInput.StockId,
                 TimeOut = placeBidInput.TimeOut
             };
-            await _stockTraderBrokerClient.PostBuyRequest(buyRequestInput, jwtToken);
-            return Ok();
+            var validationResult = await _stockTraderBrokerClient.PostBuyRequest(buyRequestInput, jwtToken);
+            return validationResult.Valid ? new ValidationResult{Valid = true, ErrorMessage = string.Empty} : validationResult;
         }
     }
 }

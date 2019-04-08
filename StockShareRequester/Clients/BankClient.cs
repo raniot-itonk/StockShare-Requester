@@ -11,7 +11,7 @@ namespace StockShareRequester.Clients
 {
     public interface IBankClient
     {
-        Task<Guid> Reserve(ReservationRequest reservationRequest, string jwtToken);
+        Task<ReservationResult> Reserve(ReservationRequest reservationRequest, string jwtToken);
     }
 
     public class BankClient : IBankClient
@@ -24,11 +24,11 @@ namespace StockShareRequester.Clients
                            throw new ArgumentNullException(nameof(serviceOption.CurrentValue.BankService));
         }
 
-        public async Task<Guid> Reserve(ReservationRequest reservationRequest, string jwtToken)
+        public async Task<ReservationResult> Reserve(ReservationRequest reservationRequest, string jwtToken)
         {
             return await PolicyHelper.ThreeRetriesAsync().ExecuteAsync(() =>
                 _bankService.BaseAddress.AppendPathSegment(_bankService.BankPath.Reservation)
-                    .WithOAuthBearerToken(jwtToken).PostJsonAsync(reservationRequest).ReceiveJson<Guid>());
+                    .WithOAuthBearerToken(jwtToken).PostJsonAsync(reservationRequest).ReceiveJson<ReservationResult>());
         }
     }
 }
