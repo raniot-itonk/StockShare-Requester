@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -48,6 +49,8 @@ namespace StockShareRequester
             services.AddScoped<ITobinTaxerClient, TobinTaxerClient>();
             services.AddScoped<IPublicShareOwnerControlClient, PublicShareOwnerControlClient>();
             services.Configure<Services>(Configuration.GetSection(nameof(Services)));
+
+            services.AddHealthChecks();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -64,6 +67,8 @@ namespace StockShareRequester
                 app.UseHsts();
             }
 
+            SetupReadyAndLiveHealthChecks(app);
+
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
@@ -74,6 +79,21 @@ namespace StockShareRequester
 
             app.UseHttpsRedirection();
             app.UseMvc();
+        }
+
+
+        private static void SetupReadyAndLiveHealthChecks(IApplicationBuilder app)
+        {
+            app.UseHealthChecks("/health/ready", new HealthCheckOptions()
+            {
+                // Exclude all checks and return a 200-Ok.
+                Predicate = (_) => false
+            });
+            app.UseHealthChecks("/health/live", new HealthCheckOptions()
+            {
+                // Exclude all checks and return a 200-Ok.
+                Predicate = (_) => false
+            });
         }
     }
 }
