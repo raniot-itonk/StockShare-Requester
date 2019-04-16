@@ -58,5 +58,13 @@ namespace StockShareRequester.Controllers
             var validationResult = await _stockTraderBrokerClient.PostBuyRequest(buyRequestInput, jwtToken);
             return validationResult.Valid ? new ValidationResult{Valid = true, ErrorMessage = string.Empty} : validationResult;
         }
+
+        [HttpDelete("{id}")]
+        public async Task<ActionResult<ValidationResult>> DeleteBuyRequest(long id)
+        {
+            var validationResult = await _stockTraderBrokerClient.RemoveBuyRequest(id, "jwtToken");
+            _logger.LogInformation("Tried to delete sell request with result {@result}", validationResult);
+            return validationResult;
+        }
     }
 }
