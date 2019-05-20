@@ -63,7 +63,7 @@ namespace StockShareRequester.Controllers
         public async Task<ActionResult<ValidationResult>> DeleteBuyRequest(long id)
         {
             var validationResult = await _stockTraderBrokerClient.RemoveBuyRequest(id, "jwtToken");
-            _logger.LogInformation("Tried to delete sell request with result {@result}", validationResult);
+            _logger.LogInformation("Tried to delete buy request with result {@result}", validationResult);
             return validationResult;
         }
     }
